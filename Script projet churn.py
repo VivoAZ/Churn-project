@@ -1,99 +1,107 @@
-# Import des données 
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.metrics import roc_auc_score, classification_report
 
-import pandas as pd 
-file_path_train = 'C:/Users/HP PROBOOK/Documents/churn-bigml-80.csv' 
-df_train = pd.read_csv(file_path_train)
 
-df_train.head() 
+def load_data(file_path, target_column):
+    """
+    Charge un fichier CSV et sépare les caractéristiques des étiquettes.
 
-df_train.info() 
+    Parameters:
+    - file_path (str): Chemin vers le fichier CSV.
+    - target_column (str): Nom de la colonne cible.
 
-# Séparation des variables 
+    Returns:
+    - X (DataFrame): Données sans la colonne cible.
+    - y (Series): Colonne cible.
+    """
+    df = pd.read_csv(file_path)
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+    return X, y
 
-categorical_features = ['State', 'International plan', 'Voice mail plan', 'Area code'] 
-numeric_features = ['Account length', 'Number vmail messages', 'Total day minutes', 'Total day calls', 'Total day charge', 
-                    'Total eve minutes', 'Total eve calls', 'Total eve charge', 'Total night minutes', 'Total night calls', 'Total night charge', 
-                    'Total intl minutes', 'Total intl calls', 'Total intl charge', 'Customer service calls'] 
 
-# Encodage et standardisation 
+def preprocess_data(numeric_features, categorical_features):
+    """
+    Configure un préprocesseur combinant standardisation des variables numériques 
+    et encodage des variables catégorielles.
 
-from sklearn.preprocessing import OneHotEncoder, StandardScaler 
-from sklearn.compose import ColumnTransformer 
+    Parameters:
+    - numeric_features (list): Liste des colonnes numériques.
+    - categorical_features (list): Liste des colonnes catégoriques.
 
-# Application 
-preprocessor = ColumnTransformer(
-    transformers=[
-    ('num', StandardScaler(), numeric_features), 
-    ('cat', OneHotEncoder(), categorical_features)
-    ]) 
+    Returns:
+    - preprocessor (ColumnTransformer): Préprocesseur configuré.
+    """
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', StandardScaler(), numeric_features),
+            ('cat', OneHotEncoder(), categorical_features)
+        ]
+    )
+    return preprocessor
 
-# Application du prétraitement aux données de train
 
-# Création d'un nouveau Dataframe pour les caratérisques sans la cible 
-X_train = df_train.drop(columns=["Churn"]) 
+def train_and_evaluate_models(models, X_train, y_train, X_test, y_test):
+    """
+    Entraîne et évalue plusieurs modèles de classification.
 
-# Extraction de la colonne cible 
-y_train = df_train['Churn'] 
+    Parameters:
+    - models (dict): Dictionnaire de modèles à entraîner.
+    - X_train (array): Données d'entraînement.
+    - y_train (Series): Étiquettes d'entraînement.
+    - X_test (array): Données de test.
+    - y_test (Series): Étiquettes de test.
 
-# Application de la transformation 
-X_train = preprocessor.fit_transform(X_train) 
+    Returns:
+    - results (dict): Résultats des métriques pour chaque modèle.
+    """
+    results = {}
+    for name, model in models.items():
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        auc_score = roc_auc_score(y_test, y_pred)
+        results[name] = {
+            "classification_report": classification_report(y_test, y_pred),
+            "AUC": auc_score
+        }
+        print(f"Model: {name}")
+        print(results[name]["classification_report"])
+        print(f"AUC: {auc_score}\n")
+    return results
 
-# Affichage des dimensions après prétraitement 
 
-print(X_train.shape) 
-print(y_train.shape)  
+# Définition des colonnes
+categorical_features = ['State', 'International plan', 'Voice mail plan', 'Area code']
+numeric_features = ['Account length', 'Number vmail messages', 'Total day minutes', 'Total day calls',
+                    'Total day charge', 'Total eve minutes', 'Total eve calls', 'Total eve charge',
+                    'Total night minutes', 'Total night calls', 'Total night charge', 'Total intl minutes',
+                    'Total intl calls', 'Total intl charge', 'Customer service calls']
 
-# Chargeons les données de test 
-file_path_test = 'C:/Users/HP PROBOOK/Documents/churn-bigml-20.csv' 
+# Chargement des données
+train_file = 'C:/Users/HP PROBOOK/Documents/churn-bigml-80.csv'
+test_file = 'C:/Users/HP PROBOOK/Documents/churn-bigml-20.csv'
+X_train, y_train = load_data(train_file, target_column="Churn")
+X_test, y_test = load_data(test_file, target_column="Churn")
 
-df_test = pd.read_csv(file_path_test) 
+# Prétraitement
+preprocessor = preprocess_data(numeric_features, categorical_features)
+X_train = preprocessor.fit_transform(X_train)
+X_test = preprocessor.transform(X_test)
 
-df_test.head() 
-
-# Verification des dimensions 
-print(f'les dimensions du jeu de données de test sont : {df_test.shape}') 
-
-# Prétraitement des données de test 
-
-# Création d'un nouveau Dataframe pour les caratérisques sans la cible 
-X_test = df_test.drop(columns=["Churn"]) 
-
-# Extraction de la colonne cible 
-y_test = df_test['Churn'] 
-
-# Application de la transformation 
-X_test = preprocessor.fit_transform(X_test) 
-
-# Affichage des dimensions après prétraitement 
-
-print(X_test.shape) 
-print(y_test.shape) 
-
-# Implémentation et entraînement des modèles 
-
-from sklearn.linear_model import LogisticRegression 
-from sklearn.neighbors import KNeighborsClassifier 
-from sklearn.svm import SVC 
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier 
-from sklearn.metrics import roc_auc_score, classification_report 
-
-# Definir les modèles à entraîner 
-
+# Définition des modèles
 models = {
-'Regression Logistique' : LogisticRegression(random_state=42),
-'Suport Vecteur Machine' : SVC(probability=True, random_state=42),
-'K-N' : KNeighborsClassifier(), 
-'GBoost' : GradientBoostingClassifier(random_state=42), 
-'Forêt Aléatoire': RandomForestClassifier(random_state=42)
+    'Regression Logistique': LogisticRegression(random_state=42),
+    'Support Vecteur Machine': SVC(probability=True, random_state=42),
+    'K-Neighbors': KNeighborsClassifier(),
+    'Gradient Boosting': GradientBoostingClassifier(random_state=42),
+    'Forêt Aléatoire': RandomForestClassifier(random_state=42)
 }
-   
-   # Entraînement et Evaluation des modèles 
 
-for name, model in models.items(): 
-    model.fit(X_train, y_train) 
-    y_pred = model.predict(X_test) 
-    auc_score = roc_auc_score(y_test, y_pred) 
-    print(f"Model: {name}") 
-    print(classification_report(y_test, y_pred)) 
-    print(f"AUC: {auc_score}\n")  
-    
+# Entraînement et évaluation
+results = train_and_evaluate_models(models, X_train, y_train, X_test, y_test)
