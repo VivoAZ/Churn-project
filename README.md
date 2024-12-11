@@ -12,6 +12,7 @@ Ce modèle permet de prédire le risque de churn des clients grâce à une proba
 ## Installation 
 
 1- Cloner le dépôt 
+
 git clone https://github.com/VivoAZ/Churn-project 
 
 cd Churn-project 
