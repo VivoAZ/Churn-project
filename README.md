@@ -18,8 +18,10 @@ cd Churn-project
 
 2- Créer et activer un environnement virtuel (venv) 
 
-python -m venv env
-source env/bin/activate  # Pour Linux/macOS
+python -m venv env 
+
+source env/bin/activate  # Pour Linux/macOS 
+
 env\Scripts\activate     # Pour Windows
 
 3- Installer les dépendances 
@@ -35,11 +37,16 @@ N'oubliez pas de vérifier le chemin d'accès du fichier main.py selon où vous 
 
 ## Structure du projet 
 
-main.py : Script principal pour l’entraînement et la prédiction du modèle.
-churn-bigml-20.csv : Le jeu de données de test.
-churn-bigml-80.csv : Le jeu de données de train.
-gradient_boosting_model.pkl : Modèle sauvegardé au format .pkl.
-Projet churn.ipynb : Notebook Jupyter pour l’analyse exploratoire et les tests.
+main.py : Script principal pour l’entraînement et la prédiction du modèle. 
+
+churn-bigml-20.csv : Le jeu de données de test. 
+
+churn-bigml-80.csv : Le jeu de données de train. 
+
+gradient_boosting_model.pkl : Modèle sauvegardé au format .pkl. 
+
+Projet churn.ipynb : Notebook Jupyter pour l’analyse exploratoire et les tests. 
+
 requirements.txt : Liste des dépendances nécessaires. 
 
 ## Données 
@@ -50,8 +57,10 @@ Les informations proviennent de la plateforme publique Kaggle.
 
 Si vous souhaitez contribuer :
 
-1- Forkez le projet.
-2- Créez une branche (git checkout -b ma-branche).
+1- Forkez le projet. 
+
+2- Créez une branche (git checkout -b ma-branche). 
+
 3- Soumettez une Pull Request. 
 
 
