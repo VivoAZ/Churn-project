@@ -11,13 +11,13 @@ Ce modèle permet de prédire le risque de churn des clients grâce à une proba
 
 ## Installation 
 
-1- Cloner le dépôt 
+### 1- Cloner le dépôt 
 
 git clone https://github.com/VivoAZ/Churn-project 
 
 cd Churn-project 
 
-2- Créer et activer un environnement virtuel (venv) 
+### 2- Créer et activer un environnement virtuel (venv) 
 
 python -m venv env 
 
@@ -25,7 +25,7 @@ source env/bin/activate  # Pour Linux/macOS
 
 env\Scripts\activate     # Pour Windows
 
-3- Installer les dépendances 
+### 3- Installer les dépendances 
 
 pip install -r requirements.txt 
 
